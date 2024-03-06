@@ -75,82 +75,20 @@ func (handler *UserHandler) GetAllUsers(c echo.Context) error {
 
 	// Filter role admin atau user
 	roleParam := c.QueryParam("role")
-	validRoles := []string{"admin", "user"} // Sesuaikan dengan role yang diperbolehkan
-
-	if !isValidRole(roleParam, validRoles) {
-		return golangmodule.BuildResponse(nil, http.StatusBadRequest, "Invalid role parameter", c)
-	}
-	if roleParam == "admin" || roleParam == "user" {
-		// Jika parameter role adalah "admin" atau "user", maka kita filter data sesuai peran
-		var userList []user.UserCore
-		result, err := handler.userService.GetByRole(&userList, roleParam)
-		if err != nil {
-			log.Printf("Error in GetByRole: %s", err)
-			return golangmodule.BuildResponse(nil, http.StatusInternalServerError, "Internal Server Error", c)
-		}
-		var userResponse []ResponseUser
-
-		// Menghindari membuat slice kosong jika tidak ada hasil
-		if len(result) > 0 {
-			userResponse = make([]ResponseUser, len(result))
-			for i, v := range result {
-				userResponse[i] = ResponseUser{
-					ID:      v.ID,
-					Nama:    v.Nama,
-					Email:   v.Email,
-					Telepon: v.Telepon,
-					Alamat:  v.Alamat,
-				}
-			}
-		}
-
-		return golangmodule.BuildResponse(userResponse, http.StatusOK, "Success get data by role", c)
-	}
-
-	// Fitur pencarian berdasarkan nama, email, dan alamat
 	searchParam := c.QueryParam("search")
-	if searchParam != "" {
-		var userList []user.UserCore
-		result, err := handler.userService.SearchUsers(&userList, searchParam)
-		if err != nil {
-			log.Printf("Error in SearchUsers: %s", err)
-			return golangmodule.BuildResponse(nil, http.StatusInternalServerError, "Internal Server Error", c)
-		}
 
-		var userResponse []ResponseUser
-
-		// Menghindari membuat slice kosong jika tidak ada hasil
-		if len(result) > 0 {
-			userResponse = make([]ResponseUser, len(result))
-			for i, v := range result {
-				userResponse[i] = ResponseUser{
-					ID:      v.ID,
-					Nama:    v.Nama,
-					Email:   v.Email,
-					Telepon: v.Telepon,
-					Alamat:  v.Alamat,
-				}
-			}
-		}
-
-		return golangmodule.BuildResponse(userResponse, http.StatusOK, "Success get search data", c)
-	}
-
-	// Menggunakan tipe data slice kosong daripada nil jika tidak ada hasil
-	result, err := handler.userService.GetAll()
+	userList, err := handler.getUsersByFilter(roleParam, searchParam)
 	if err != nil {
-		// Logging kesalahan untuk memudahkan debug
-		log.Printf("Error in GetAllUsers (userService.GetAll): %s", err)
-		// Menggunakan HTTP status code konstan dari paket net/http
+		log.Printf("Error in getUsersByFilter: %s", err)
 		return golangmodule.BuildResponse(nil, http.StatusInternalServerError, "Internal Server Error", c)
 	}
 
 	var userResponse []ResponseUser
 
 	// Menghindari membuat slice kosong jika tidak ada hasil
-	if len(result) > 0 {
-		userResponse = make([]ResponseUser, len(result))
-		for i, v := range result {
+	if len(userList) > 0 {
+		userResponse = make([]ResponseUser, len(userList))
+		for i, v := range userList {
 			userResponse[i] = ResponseUser{
 				ID:      v.ID,
 				Nama:    v.Nama,
@@ -164,16 +102,9 @@ func (handler *UserHandler) GetAllUsers(c echo.Context) error {
 	// Logging informasi sukses
 	log.Printf("Successfully fetched %d users", len(userResponse))
 
-	return golangmodule.BuildResponse(userResponse, http.StatusOK, "Successfully get all users", c)
+	return golangmodule.BuildResponse(userResponse, http.StatusOK, "Successfully get users", c)
 }
-func isValidRole(role string, validRoles []string) bool {
-	for _, validRole := range validRoles {
-		if strings.ToLower(role) == strings.ToLower(validRole) {
-			return true
-		}
-	}
-	return false
-}
+
 
 func (handler *UserHandler) GetUsersById(c echo.Context) error {
 	dummyParam := c.QueryParam("dummy")

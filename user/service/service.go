@@ -68,31 +68,8 @@ func (s *userService) GetAll() ([]user.UserCore, error) {
 	return result, nil
 }
 
-// SelectById implements user.ServiceInterface.
-func (s *userService) SelectById(id string) (user.UserCore, error) {
-	if id == "" {
-		return user.UserCore{}, errors.New("id cannot be empty")
-	}
-
-	result, err := s.userData.SelectById(id)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return user.UserCore{}, fmt.Errorf("user with id %s not found", id)
-		}
-		return user.UserCore{}, fmt.Errorf("error in SelectById (userData.SelectById): %s", err)
-	}
-
-	if result.ID == "" {
-		// Jika ID adalah string kosong, ini menunjukkan bahwa data tidak ditemukan
-		return user.UserCore{}, fmt.Errorf("user with id %s not found", id)
-	}
-
-	return result, nil
-}
-
 // GetByRole implements user.ServiceInterface.
 func (s *userService) GetByRole(userList *[]user.UserCore, role string) ([]user.UserCore, error) {
-
 	result, err := s.userData.GetByRole(userList, role)
 	if err != nil {
 		// Manajemen kesalahan di sini, Anda bisa memilih untuk melakukan logging atau
@@ -112,6 +89,28 @@ func (s *userService) SearchUsers(userList *[]user.UserCore, searchParam string)
 		// Contoh: log.Println("Error in SearchUsers:", err)
 		return nil, err
 	}
+	return result, nil
+}
+
+// SelectById implements user.ServiceInterface.
+func (s *userService) SelectById(id string) (user.UserCore, error) {
+	if id == "" {
+		return user.UserCore{}, errors.New("id cannot be empty")
+	}
+
+	result, err := s.userData.SelectById(id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return user.UserCore{}, fmt.Errorf("user with id %s not found", id)
+		}
+		return user.UserCore{}, fmt.Errorf("error in SelectById (userData.SelectById): %s", err)
+	}
+
+	if result.ID == "" {
+		// Jika ID adalah string kosong, ini menunjukkan bahwa data tidak ditemukan
+		return user.UserCore{}, fmt.Errorf("user with id %s not found", id)
+	}
+
 	return result, nil
 }
 

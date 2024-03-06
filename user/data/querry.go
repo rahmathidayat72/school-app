@@ -207,13 +207,14 @@ func (r *UserQuery) Update(insert user.UserCore, id string) error {
 	// Constructing the SQL query for update
 	query := `
 	UPDATE school."user" u
-	SET
-	nama = COALESCE(NULLIF(?,''), nama),
-	email = COALESCE(NULLIF(?,''), email),
-	password = CASE WHEN ? != '' THEN ? ELSE password END,
-	telepon = COALESCE(NULLIF(?,''), telepon),
-	alamat = COALESCE(NULLIF(?,''), alamat)
-	WHERE id = ?
+SET
+  nama = COALESCE(NULLIF(?, ''), nama),
+  email = COALESCE(NULLIF(?, ''), email),
+  password = CASE WHEN ? != '' THEN ? ELSE password END,
+  telepon = COALESCE(NULLIF(?, ''), telepon),
+  alamat = COALESCE(NULLIF(?, ''), alamat),
+  "update_ad" = NOW()
+	WHERE id = ?;
     `
 	hashedPassword := helpers.HashPassword(insert.Password)
 
