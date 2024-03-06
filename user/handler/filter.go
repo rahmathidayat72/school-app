@@ -2,6 +2,8 @@ package handler
 
 import "apk-sekolah/user"
 
+
+
 func (handler *UserHandler) getUsersByFilter(roleParam, searchParam string) ([]user.UserCore, error) {
 	// Jika parameter role adalah "admin" atau "user", maka kita filter data sesuai peran
 	if roleParam != "" {

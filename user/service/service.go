@@ -4,6 +4,7 @@ import (
 	"apk-sekolah/user"
 	"errors"
 	"fmt"
+	"log"
 
 	golangmodule "github.com/rahmathidayat72/golang-module"
 	"gorm.io/gorm"
@@ -74,9 +75,14 @@ func (s *userService) GetByRole(userList *[]user.UserCore, role string) ([]user.
 	if err != nil {
 		// Manajemen kesalahan di sini, Anda bisa memilih untuk melakukan logging atau
 		// mengembalikan kesalahan kepada pemanggil fungsi.
-		// Contoh: log.Println("Error in GetByRole:", err)
-		return nil, err
+		log.Println("Error in GetByRole:", err)
+		return result, errors.New("invalid role input")
 	}
+	// Validasi apakah role yang diberikan sesuai dengan data di database
+	if len(result) == 0 {
+		return result, errors.New("no users found for the specified role")
+	}
+
 	return result, nil
 }
 
@@ -86,8 +92,12 @@ func (s *userService) SearchUsers(userList *[]user.UserCore, searchParam string)
 	if err != nil {
 		// Manajemen kesalahan di sini, Anda bisa memilih untuk melakukan logging atau
 		// mengembalikan kesalahan kepada pemanggil fungsi.
-		// Contoh: log.Println("Error in SearchUsers:", err)
-		return nil, err
+		log.Println("Error in SearchUsers:", err)
+		return result, errors.New("invalid role input")
+	}
+	// Validasi apakah role yang diberikan sesuai dengan data di database
+	if len(result) == 0 {
+		return result, errors.New("no users found for the specified Search")
 	}
 	return result, nil
 }

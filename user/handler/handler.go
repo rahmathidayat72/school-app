@@ -80,7 +80,7 @@ func (handler *UserHandler) GetAllUsers(c echo.Context) error {
 	userList, err := handler.getUsersByFilter(roleParam, searchParam)
 	if err != nil {
 		log.Printf("Error in getUsersByFilter: %s", err)
-		return golangmodule.BuildResponse(nil, http.StatusInternalServerError, "Internal Server Error", c)
+		return golangmodule.BuildResponse(nil, http.StatusBadRequest, "Invalid input", c)
 	}
 
 	var userResponse []ResponseUser
@@ -104,7 +104,6 @@ func (handler *UserHandler) GetAllUsers(c echo.Context) error {
 
 	return golangmodule.BuildResponse(userResponse, http.StatusOK, "Successfully get users", c)
 }
-
 
 func (handler *UserHandler) GetUsersById(c echo.Context) error {
 	dummyParam := c.QueryParam("dummy")
