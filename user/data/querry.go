@@ -26,7 +26,7 @@ func (r *UserQuery) Insert(insert user.UserCore) error {
 
 	result := r.db.Exec(`
 	INSERT INTO school."user" (id,nama, email, password, telepon, alamat, role)
-	VALUES (?,?, ?, ?, ?, ?, ?)
+	VALUES (?,?, ?, ?, ?, ?, ?) 
 	`, userInput.ID, userInput.Nama, userInput.Email, userInput.Password, userInput.Telepon, userInput.Alamat, userInput.Role)
 
 	if result.Error != nil {
@@ -155,7 +155,6 @@ func (r *UserQuery) DetailByName(nama string) (user.UserCore, error) {
 		log.Printf("Error executing SELECT query: %v", tx.Error)
 		return user.UserCore{}, tx.Error
 	}
-
 	userResponse := FormatterResponse(dataUser)
 	return userResponse, nil
 }
@@ -203,17 +202,16 @@ func (r *UserQuery) Update(insert user.UserCore, id string) error {
 		log.Printf("User with ID %s not found", id)
 		return errors.New("User id not found")
 	}
-
 	// Constructing the SQL query for update
 	query := `
 	UPDATE school."user" u
-SET
-  nama = COALESCE(NULLIF(?, ''), nama),
-  email = COALESCE(NULLIF(?, ''), email),
-  password = CASE WHEN ? != '' THEN ? ELSE password END,
-  telepon = COALESCE(NULLIF(?, ''), telepon),
-  alamat = COALESCE(NULLIF(?, ''), alamat),
-  "update_ad" = NOW()
+	SET
+	nama = COALESCE(NULLIF(?, ''), nama),
+	email = COALESCE(NULLIF(?, ''), email),
+	password = CASE WHEN ? != '' THEN ? ELSE password END,
+	telepon = COALESCE(NULLIF(?, ''), telepon),
+	alamat = COALESCE(NULLIF(?, ''), alamat),
+	"update_ad" = NOW()
 	WHERE id = ?;
     `
 	hashedPassword := helpers.HashPassword(insert.Password)
@@ -328,7 +326,7 @@ func (r *UserQuery) SearchUsers(userList *[]user.UserCore, searchParam string) (
 	var dataUser []User
 	tx := r.db.Raw(`
 	SELECT * FROM school."user" u
-	WHERE u."nama" LIKE ?  OR u."email" LIKE ? OR u."alamat" LIKE ? AND "delete_ad" IS NULL
+	WHERE (u."nama" LIKE ? OR u."email" LIKE ? OR u."alamat" LIKE ?) AND "delete_ad" IS NULL
 	`, "%"+searchParam+"%", "%"+searchParam+"%", "%"+searchParam+"%").Scan(&dataUser)
 	if tx.Error != nil {
 		log.Printf("Error executing SELECT query: %v", tx.Error)
