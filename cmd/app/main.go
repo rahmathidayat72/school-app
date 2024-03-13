@@ -3,9 +3,9 @@ package main
 import (
 	"apk-sekolah/config"
 	"apk-sekolah/database"
-	"apk-sekolah/user/data"
-	"apk-sekolah/user/handler"
-	"apk-sekolah/user/service"
+	"apk-sekolah/auth/data"
+	"apk-sekolah/auth/handler"
+	"apk-sekolah/auth/service"
 	"log"
 	"net/http"
 
@@ -34,9 +34,9 @@ func main() {
 		Format: `[${time_rfc3339}] ${status} ${method} ${host}${path} ${latency_human}` + "\n",
 	}))
 
-	dataUser := data.NewDataUser(db)
-	userService := service.NewServiceUser(dataUser)
-	userHandlerAPI := handler.NewHandlerUser(userService)
+	dataAuth := data.NewDataAuth(db)
+	authService := service.NewServiceAuth(dataAuth)
+	authHandlerAPI := handler.NewHandlerAuth(authService)
 
 	v1 := e.Group("/api/v1")
 	v1.GET("/home", func(c echo.Context) error {
@@ -44,13 +44,9 @@ func main() {
 			"messages": "Hello, World!",
 		})
 	})
-	user := v1.Group("/user")
-	user.POST("/add", userHandlerAPI.CreatedUser)
-	user.GET("/list", userHandlerAPI.GetAllUsers)
-	user.GET("/detail-id/:id", userHandlerAPI.GetUsersById)
-	user.GET("/detail-name/:nama", userHandlerAPI.DetailByName)
-	user.POST("/update/:id", userHandlerAPI.UpdateUser)
-	user.DELETE("/delete/:id", userHandlerAPI.DeleteUser)
+	auth := v1.Group("/auth")
+	auth.POST("/login", authHandlerAPI.LoginUser)
+	
 
 	// Menambahkan pesan log untuk informasi port aplikasi
 	port := ":8080"

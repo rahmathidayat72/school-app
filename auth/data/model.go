@@ -1,10 +1,9 @@
 package data
 
 import (
-	"apk-sekolah/user"
+	auth "apk-sekolah/auth"
 	"time"
 
-	golangmodule "github.com/rahmathidayat72/golang-module"
 	"gorm.io/gorm"
 )
 
@@ -27,24 +26,18 @@ func (u *User) TableName() string {
 	return "user"
 }
 
-func FormatterRequest(req user.UserCore) User {
+func FormatterRequest(req User) User {
 	return User{
-		ID:       golangmodule.GenerateUUIDV4(),
-		Nama:     req.Nama,
 		Email:    req.Email,
 		Password: req.Password,
-		Telepon:  req.Telepon,
-		Alamat:   req.Alamat,
-		Role:     req.Role,
 	}
 }
 
-func FormatterResponse(res User) user.UserCore {
-	return user.UserCore{
-		ID:      res.ID,
-		Nama:    res.Nama,
-		Email:   res.Email,
-		Telepon: res.Telepon,
-		Alamat:  res.Alamat,
+// Fungsi untuk mengkonversi model User ke AuthCore
+func FormattingAuth(user User) auth.AuthCore {
+	return auth.AuthCore{
+		ID:    user.ID,
+		Email: user.Email,
+		// Tambahkan atribut lain yang perlu diambil dari user
 	}
 }
