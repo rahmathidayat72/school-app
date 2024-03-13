@@ -22,12 +22,16 @@ func NewDataUser(db *gorm.DB) user.DataInterface {
 // Insert implements user.DataInterface.
 func (r *UserQuery) Insert(insert user.UserCore) error {
 	userInput := FormatterRequest(insert)
-	userInput.Password = helpers.HashPassword(userInput.Password)
+	hashedPassword, err := helpers.HashPassword(userInput.Password)
+	if err != nil {
+		log.Printf("Error hashing password: %v", err)
+		return err
+	}
 
 	result := r.db.Exec(`
-	INSERT INTO school."user" (id,nama, email, password, telepon, alamat, role)
-	VALUES (?,?, ?, ?, ?, ?, ?) 
-	`, userInput.ID, userInput.Nama, userInput.Email, userInput.Password, userInput.Telepon, userInput.Alamat, userInput.Role)
+        INSERT INTO school."user" (id, nama, email, password, telepon, alamat, role)
+        VALUES (?, ?, ?, ?, ?, ?, ?) 
+    `, userInput.ID, userInput.Nama, userInput.Email, hashedPassword, userInput.Telepon, userInput.Alamat, userInput.Role)
 
 	if result.Error != nil {
 		log.Printf("Error inserting user: %v", result.Error)
@@ -202,6 +206,11 @@ func (r *UserQuery) Update(insert user.UserCore, id string) error {
 		log.Printf("User with ID %s not found", id)
 		return errors.New("User id not found")
 	}
+	hashedPassword, err := helpers.HashPassword(insert.Password)
+	if err != nil {
+		return errors.New("Failed to hash password")
+	}
+
 	// Constructing the SQL query for update
 	query := `
 	UPDATE school."user" u
@@ -214,7 +223,6 @@ func (r *UserQuery) Update(insert user.UserCore, id string) error {
 	"update_ad" = NOW()
 	WHERE id = ?;
     `
-	hashedPassword := helpers.HashPassword(insert.Password)
 
 	// Executing the update query
 	result := r.db.Exec(query,
