@@ -1,7 +1,7 @@
 package data
 
 import (
-	"apk-sekolah/user"
+	"apk-sekolah/app/user"
 	"time"
 
 	golangmodule "github.com/rahmathidayat72/golang-module"

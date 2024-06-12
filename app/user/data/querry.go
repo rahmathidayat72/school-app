@@ -1,8 +1,9 @@
 package data
 
 import (
+	"apk-sekolah/app/user"
 	"apk-sekolah/helpers"
-	"apk-sekolah/user"
+
 	"errors"
 	"log"
 
@@ -44,43 +45,6 @@ func (r *UserQuery) Insert(insert user.UserCore) error {
 	return nil
 }
 
-// func (r *UserQuery) Insert(insert user.UserCore) error {
-// 	// panic("unimplemented")
-// 	userInput := FormatterRequest(insert)
-// 	userInput.Password = helpers.HashPassword(userInput.Password)
-// 	tx := r.db.Create(&userInput)
-// 	if tx.Error != nil {
-// 		log.Printf("Error inserting user: %v", tx.Error)
-// 		return tx.Error
-// 	}
-// 	if tx.RowsAffected == 0 {
-// 		err := errors.New("failed to insert, row affected is 0")
-// 		log.Printf("Error inserting user: %v", err)
-// 		return err
-// 	}
-// 	return nil
-// }
-
-// SelectAll implements user.DataInterface.
-
-// func (r *UserQuery) SelectAll1() ([]user.UserCore, error) {
-// 	var dataUser []User
-// 	tx := r.db.Find(&dataUser)
-// 	if tx.Error != nil {
-// 		// Logging kesalahan saat mencoba mengambil data dari database
-// 		log.Printf("Error fetching users from database: %v", tx.Error)
-// 		return nil, tx.Error
-// 	}
-// 	var coreUser []user.UserCore
-// 	for _, v := range dataUser {
-// 		var user = FormatterResponse(v)
-// 		coreUser = append(coreUser, user)
-// 	}
-// 	// Logging informasi sukses
-// 	log.Printf("Successfully fetched %d users from database", len(coreUser))
-// 	return coreUser, nil
-// }
-
 func (r *UserQuery) SelectAll() ([]user.UserCore, error) {
 	var dataUser []User
 
@@ -103,22 +67,6 @@ func (r *UserQuery) SelectAll() ([]user.UserCore, error) {
 
 	return coreUser, nil
 }
-
-// SelectById implements user.DataInterface.
-
-// func (r *UserQuery) SelectById(id uint) (user.UserCore, error) {
-// 	var dataUser User
-// 	tx := r.db.Find(&dataUser, id)
-// 	if tx.Error != nil {
-// 		if tx.Error == gorm.ErrRecordNotFound {
-// 			return user.UserCore{}, errors.New("User id not found")
-// 		}
-// 		log.Printf("Error executing SELECT query: %v", tx.Error)
-// 		return user.UserCore{}, tx.Error
-// 	}
-// 	userResponse := FormatterResponse(dataUser)
-// 	return userResponse, nil
-// }
 
 func (r *UserQuery) SelectById(id string) (user.UserCore, error) {
 	var dataUser User
@@ -160,41 +108,6 @@ func (r *UserQuery) DetailByName(nama string) (user.UserCore, error) {
 	return userResponse, nil
 }
 
-// Update implements user.DataInterface.
-
-// func (r *UserQuery) Update(insert user.UserCore, id string) error {
-// 	var updateUser User
-// 	tx := r.db.First(&updateUser, id)
-// 	if tx.Error != nil {
-// 		if tx.Error == gorm.ErrRecordNotFound {
-// 			return errors.New("User id not found")
-// 		}
-// 		return tx.Error
-// 	}
-// 	//mengecek ada data yang terupdate atau tidak
-// 	if tx.RowsAffected == 0 {
-// 		return errors.New("user id not found")
-// 	}
-// 	updateUser.Nama = insert.Nama
-// 	updateUser.Email = insert.Email
-// 	updateUser.Password = insert.Password
-// 	updateUser.Telepon = insert.Telepon
-// 	updateUser.Alamat = insert.Alamat
-// 	updateUser.Role = insert.Role
-// 	// Menggunakan helper.HashPassword untuk mengamankan password baru
-// 	if insert.Password != "" {
-// 		updateUser.Password = helpers.HashPassword(insert.Password)
-// 	}
-// 	userResponse := FormatterRequest(insert)
-// 	userResponse.Password = helpers.HashPassword(updateUser.Password)
-// 	r.db.Model(&User{}).Where("id=?", id).Updates(updateUser)
-// 	tx = r.db.Model(&User{}).Where("id=?", id).Updates(updateUser)
-// 	if tx.Error != nil {
-// 		return tx.Error
-// 	}
-// 	return nil
-// }
-
 func (r *UserQuery) Update(insert user.UserCore, id string) error {
 	// Checking if the user exists
 	var count int64
@@ -235,49 +148,6 @@ func (r *UserQuery) Update(insert user.UserCore, id string) error {
 	return nil
 }
 
-// Delete implements user.DataInterface.
-
-// func (r *UserQuery) Delete(id string) error {
-// 	var deleteUser = User{}
-// 	tx := r.db.Delete(&deleteUser, id)
-// 	if tx.Error != nil {
-// 		log.Printf("Failed to delete user: %v", tx.Error)
-// 		errors.New("failed delete user")
-// 	}
-// 	if tx.RowsAffected == 0 {
-// 		log.Printf("User ID not found: %s", id)
-// 		return errors.New("user id not found")
-// 	}
-// 	return nil
-// }
-
-//hardDelete
-// func (r *UserQuery) Delete(id string) error {
-// 	// Checking if the user exists
-// 	var count int64
-// 	r.db.Raw(`SELECT COUNT(*) FROM school."user" u WHERE "id" = ?`, id).Count(&count)
-// 	if count == 0 {
-// 		log.Printf("User with ID %s not found", id)
-// 		return errors.New("User ID not found")
-// 	}
-
-// 	// Constructing the SQL query for delete
-// 	query := `DELETE FROM school."user" u WHERE "id" = ?`
-// 	result := r.db.Exec(query, id)
-
-// 	if result.Error != nil {
-// 		log.Printf("Failed to delete user: %v", result.Error)
-// 		return errors.New("failed to delete user")
-// 	}
-
-//		if result.RowsAffected == 0 {
-//			log.Printf("User ID not found: %s", id)
-//			return errors.New("user ID not found")
-//		}
-//		return nil
-//	}
-//
-// softDelete
 func (r *UserQuery) Delete(id string) error {
 	// Checking if the user exists
 	var count int64

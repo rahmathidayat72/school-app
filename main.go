@@ -1,11 +1,14 @@
 package main
 
 import (
+	authdata "apk-sekolah/app/auth/data"
+	authhandler "apk-sekolah/app/auth/handler"
+	authservice "apk-sekolah/app/auth/service"
+	"apk-sekolah/app/user/data"
+	"apk-sekolah/app/user/handler"
+	"apk-sekolah/app/user/service"
 	"apk-sekolah/config"
 	"apk-sekolah/database"
-	"apk-sekolah/user/data"
-	"apk-sekolah/user/handler"
-	"apk-sekolah/user/service"
 	"log"
 	"net/http"
 
@@ -38,20 +41,27 @@ func main() {
 	userService := service.NewServiceUser(dataUser)
 	userHandlerAPI := handler.NewHandlerUser(userService)
 
+	authUser := authdata.NewDataAuth(db)
+	authService := authservice.NewServiceAuth(authUser)
+	authHandlerAPI := authhandler.NewHandlerAuth(authService)
+
 	v1 := e.Group("/api/v1")
 	v1.GET("/home", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"messages": "Hello, World!",
 		})
 	})
+	v1.POST("/register", userHandlerAPI.CreatedUser)
 	user := v1.Group("/user")
-	user.POST("/add", userHandlerAPI.CreatedUser)
+	user.Use(middleware.JWT([]byte(cfg.JWT_SECRET)))
 	user.GET("/list", userHandlerAPI.GetAllUsers)
 	user.GET("/detail-id/:id", userHandlerAPI.GetUsersById)
-	user.GET("/detail-name/:nama", userHandlerAPI.DetailByName)
-	user.POST("/update/:id", userHandlerAPI.UpdateUser)
-	user.DELETE("/delete/:id", userHandlerAPI.DeleteUser)
+	user.GET("/detail-name", userHandlerAPI.DetailByName)
+	user.POST("/update", userHandlerAPI.UpdateUser)
+	user.DELETE("/delete", userHandlerAPI.DeleteUser)
 
+	auth := v1.Group("/auth")
+	auth.POST("/login", authHandlerAPI.Auth)
 	// Menambahkan pesan log untuk informasi port aplikasi
 	port := ":8080"
 	log.Printf("Server is listening on port %s", port)

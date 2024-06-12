@@ -1,7 +1,7 @@
 package service
 
 import (
-	"apk-sekolah/user"
+	"apk-sekolah/app/user"
 	"errors"
 	"fmt"
 
@@ -9,14 +9,14 @@ import (
 	"gorm.io/gorm"
 )
 
+type userService struct {
+	userData user.DataInterface
+}
+
 func NewServiceUser(repo user.DataInterface) user.ServiceInterface {
 	return &userService{
 		userData: repo,
 	}
-}
-
-type userService struct {
-	userData user.DataInterface
 }
 
 // Insert implements user.ServiceInterface.
