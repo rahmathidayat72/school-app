@@ -1,7 +1,7 @@
 package data
 
 import (
-	"apk-sekolah/app/user"
+	"apk-sekolah/features/user"
 )
 
 type (

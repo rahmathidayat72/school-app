@@ -1,6 +1,6 @@
 package service
 
-import "apk-sekolah/app/auth"
+import "apk-sekolah/features/auth"
 
 type authService struct {
 	authData auth.DataAuthInterface

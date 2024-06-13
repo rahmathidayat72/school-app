@@ -1,6 +1,6 @@
 package handler
 
-import "apk-sekolah/app/user"
+import "apk-sekolah/features/user"
 
 func (handler *UserHandler) getUsersByFilter(roleParam, searchParam string) ([]user.UserCore, error) {
 	// Jika parameter role tidak kosong, maka lakukan filter pengguna berdasarkan peran

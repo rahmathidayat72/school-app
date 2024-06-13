@@ -1,14 +1,14 @@
 package main
 
 import (
-	authdata "apk-sekolah/app/auth/data"
-	authhandler "apk-sekolah/app/auth/handler"
-	authservice "apk-sekolah/app/auth/service"
-	"apk-sekolah/app/user/data"
-	"apk-sekolah/app/user/handler"
-	"apk-sekolah/app/user/service"
 	"apk-sekolah/config"
 	"apk-sekolah/database"
+	authdata "apk-sekolah/features/auth/data"
+	authhandler "apk-sekolah/features/auth/handler"
+	authservice "apk-sekolah/features/auth/service"
+	"apk-sekolah/features/user/data"
+	"apk-sekolah/features/user/handler"
+	"apk-sekolah/features/user/service"
 	"log"
 	"net/http"
 

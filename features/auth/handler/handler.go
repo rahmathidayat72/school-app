@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"apk-sekolah/app/auth"
+	"apk-sekolah/features/auth"
 	"apk-sekolah/helpers"
 	"net/http"
 	"strings"

@@ -1,7 +1,7 @@
 package data
 
 import (
-	"apk-sekolah/app/auth"
+	"apk-sekolah/features/auth"
 	"apk-sekolah/helpers"
 	"errors"
 

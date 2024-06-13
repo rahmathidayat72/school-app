@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"apk-sekolah/app/user"
+	"apk-sekolah/features/user"
 
 	golangmodule "github.com/rahmathidayat72/golang-module"
 )

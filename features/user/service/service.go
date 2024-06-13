@@ -1,7 +1,7 @@
 package service
 
 import (
-	"apk-sekolah/app/user"
+	"apk-sekolah/features/user"
 	"errors"
 	"fmt"
 
