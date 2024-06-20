@@ -1,35 +1,40 @@
 ## Notes
 
-* Genered go mod
-    ``````
-    go mod init projectname
-    ``````
+- Genered go mod
 
-* Genered fremwork Echo
-    ``````
-    go get github.com/labstack/echo/v4
-    ``````
+  ```
+  go mod init projectname
+  ```
 
-* Genered Gorm
-    ``````
-    go get -u gorm.io/gorm
-    ``````
+- Genered fremwork Echo
 
-* Genered driver Gorm mysql
-    ``````
-    go get -u gorm.io/driver/mysql
-    ``````
+  ```
+  go get github.com/labstack/echo/v4
+  ```
 
-* Genered viper (to load .evn automatically)
-    ``````
-    go get -u github.com/spf13/viper
-    ``````
+- Genered Gorm
 
-* Created file `local.env`
-    ``````
-    export DBUSER='DB_username'
-    export DBPASS='DB_password'
-    export DBHOST='localhost'
-    export DBPORT='3306'
-    export DBNAME='db_name'
-    ``````
+  ```
+  go get -u gorm.io/gorm
+  ```
+
+- Genered driver Gorm postgres
+
+  ```
+  go get -u gorm.io/driver/postgres
+  ```
+
+- Genered viper (to load .evn automatically)
+
+  ```
+  go get -u github.com/spf13/viper
+  ```
+
+- Created file `local.env`
+  ```
+  export DBUSER='DB_username'
+  export DBPASS='DB_password'
+  export DBHOST='localhost'
+  export DBPORT='3306'
+  export DBNAME='db_name'
+  ```
