@@ -12,7 +12,7 @@ import (
 )
 
 type MetaToken struct {
-	ID  int    `json:"id"`
+	ID  string `json:"id"`
 	Exp string `json:"exp"`
 }
 

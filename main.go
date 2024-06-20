@@ -9,6 +9,7 @@ import (
 	"apk-sekolah/features/user/data"
 	"apk-sekolah/features/user/handler"
 	"apk-sekolah/features/user/service"
+	"apk-sekolah/helpers"
 	"log"
 	"net/http"
 
@@ -36,6 +37,7 @@ func main() {
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: `[${time_rfc3339}] ${status} ${method} ${host}${path} ${latency_human}` + "\n",
 	}))
+	e.Use(helpers.LoggingMiddleware) // Panggil LoggingMiddleware
 
 	dataUser := data.NewDataUser(db)
 	userService := service.NewServiceUser(dataUser)
@@ -62,6 +64,7 @@ func main() {
 
 	auth := v1.Group("/auth")
 	auth.POST("/login", authHandlerAPI.Auth)
+
 	// Menambahkan pesan log untuk informasi port aplikasi
 	port := ":8080"
 	log.Printf("Server is listening on port %s", port)
