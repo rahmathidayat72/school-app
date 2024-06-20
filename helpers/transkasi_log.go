@@ -46,16 +46,18 @@ func (u *TransactionLog) TableName() string {
 
 // Fungsi untuk mendapatkan nama layanan dari endpoint
 func GetServiceNameFromPath(path string) string {
-	parts := strings.Split(path, "/")
-	if len(parts) > 3 && parts[3] != "" {
-		return parts[3]
+	// Mengambil path endpoint tanpa query parameter
+	pathWithoutQuery := strings.Split(path, "?")[0]
+
+	parts := strings.Split(pathWithoutQuery, "/")
+	if len(parts) >= 3 && parts[len(parts)-2] != "" && parts[len(parts)-1] != "" {
+		return parts[len(parts)-2] + "/" + parts[len(parts)-1]
 	}
 	return ""
 }
 
 func LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		// Membuat buffer untuk menampung request body
 		var requestBody []byte
 		var responseBody []byte
 
@@ -64,7 +66,7 @@ func LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			c.Echo().Logger.Error("Gagal terhubung ke database:", err.Error())
 			return err
 		}
-		//defer CloseDatabase(db)
+
 		authorizationHeader := c.Request().Header.Get("Authorization")
 		accessToken := golangmodule.GetTokenFromAuthorizationHeader(authorizationHeader)
 
@@ -73,12 +75,14 @@ func LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		if accessToken != "" {
 			token, err := golangmodule.VerifyToken(accessToken)
 			if err != nil {
+				c.Echo().Logger.Error("Gagal memverifikasi token:", err)
 				return err
 			}
 			fmt.Println(token)
 
 			metaToken, err := VerifyTokenHeader(accessToken)
 			if err != nil {
+				c.Echo().Logger.Error("Gagal memverifikasi header token:", err)
 				return err
 			}
 
@@ -91,30 +95,36 @@ func LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			if c.Request().Body != nil {
 				requestBodyBytes, err := ioutil.ReadAll(c.Request().Body)
 				if err != nil {
+					c.Echo().Logger.Error("Gagal membaca request body:", err)
 					return err
 				}
-
 				c.Request().Body = ioutil.NopCloser(bytes.NewBuffer(requestBodyBytes))
 				requestBody = requestBodyBytes
 
 				var requestBodyMap map[string]interface{}
 				if err := json.Unmarshal(requestBodyBytes, &requestBodyMap); err != nil {
+					c.Echo().Logger.Error("Gagal mengurai request body:", err)
 					return err
 				}
-				username, ok := requestBodyMap["username"].(string)
+				email, ok := requestBodyMap["email"].(string)
 				if !ok {
-					return errors.New("username tidak ditemukan dalam request body")
+					err := errors.New("username tidak ditemukan dalam request body")
+					c.Echo().Logger.Error(err)
+					return err
 				}
 
-				userID, err = GetUserIDByUsername(db, username)
+				userID, err = GetUserIDByUsername(db, email)
 				if err != nil {
 					userID = ""
+					c.Echo().Logger.Error("Gagal mendapatkan user ID:", err)
 				}
 			}
 		}
+
 		if c.Request().Body != nil {
 			requestBodyBytes, err := ioutil.ReadAll(c.Request().Body)
 			if err != nil {
+				c.Echo().Logger.Error("Gagal membaca ulang request body:", err)
 				return err
 			}
 			c.Request().Body = ioutil.NopCloser(bytes.NewBuffer(requestBodyBytes))
@@ -123,7 +133,6 @@ func LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 
 		var requestBodyString string
 		if len(requestBody) == 0 {
-
 			requestBodyString = "{}"
 		} else {
 			requestBodyString = string(requestBody)
@@ -136,37 +145,32 @@ func LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		c.Response().Writer = responseWriter
 
 		if err := next(c); err != nil {
+			c.Echo().Logger.Error("Error dari handler:", err)
 			c.Error(err)
 		}
 
 		go func() {
 			perangkat, err := os.Hostname()
 			if err != nil {
-				errResponse := golangmodule.BuildResponse(nil, http.StatusInternalServerError, "Gagal mendapatkan perangkat", c)
-				c.Error(errResponse)
+				c.Echo().Logger.Error("Gagal mendapatkan perangkat:", err)
 				return
 			}
 			queryParam := c.QueryParams()
 			paramJSON, err := json.Marshal(queryParam)
 			if err != nil {
-				errResponse := golangmodule.BuildResponse(nil, http.StatusInternalServerError, "Gagal mengurai query parameter", c)
-				c.Error(errResponse)
+				c.Echo().Logger.Error("Gagal mengurai query parameter:", err)
 				return
 			}
 
-			// Membuat header dalam format JSON
 			headerJSON, err := json.Marshal(c.Request().Header)
 			if err != nil {
-				errResponse := golangmodule.BuildResponse(nil, http.StatusInternalServerError, "Gagal membuat header JSON", c)
-				c.Error(errResponse)
+				c.Echo().Logger.Error("Gagal membuat header JSON:", err)
 				return
 			}
 
-			// Mencatat informasi transaksi log
 			log := TransactionLog{
-				Timestamp: time.Now(),
-				UserID:    userID,
-				//User:         sess,
+				Timestamp:    time.Now(),
+				UserID:       userID,
 				Perangkat:    perangkat,
 				ServiceName:  GetServiceNameFromPath(c.Path()),
 				RequestBody:  requestBodyString,
@@ -183,10 +187,7 @@ func LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			}
 
 			if err := db.Create(&log).Error; err != nil {
-				c.Echo().Logger.Error("Gagal menyimpan log transaksi:", err.Error())
-				errResponse := golangmodule.BuildResponse(nil, http.StatusInternalServerError, "Gagal menyimpan log transaksi", c)
-				c.Error(errResponse)
-				return
+				c.Echo().Logger.Error("Gagal menyimpan log transaksi:", err)
 			}
 		}()
 
@@ -199,10 +200,13 @@ func (r *responseCapturer) Write(b []byte) (int, error) {
 	return r.ResponseWriter.Write(b)
 }
 
-func GetUserByUsername(db *gorm.DB, username string) (*user.UserCore, error) {
+// Mengubah fungsi GetUserByUsername agar menggunakan raw SQL
+func GetUserByUsername(db *gorm.DB, email string) (*user.UserCore, error) {
 	var userInstance user.UserCore
-	db = db.Debug().Table(userInstance.Nama)
-	if err := db.Where("username = ?", username).First(&userInstance).Error; err != nil {
+
+	// Menggunakan raw SQL untuk mendapatkan user berdasarkan username
+	sql := "SELECT * FROM user WHERE email = ? LIMIT 1"
+	if err := db.Raw(sql, email).Scan(&userInstance).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("user not found")
 		}
@@ -211,8 +215,9 @@ func GetUserByUsername(db *gorm.DB, username string) (*user.UserCore, error) {
 	return &userInstance, nil
 }
 
-func GetUserIDByUsername(db *gorm.DB, username string) (string, error) {
-	userInstance, err := GetUserByUsername(db, username)
+// Fungsi untuk mendapatkan user ID berdasarkan username menggunakan raw SQL
+func GetUserIDByUsername(db *gorm.DB, email string) (string, error) {
+	userInstance, err := GetUserByUsername(db, email)
 	if err != nil {
 		return "", err
 	}
@@ -233,9 +238,6 @@ func hashSensitiveData(body string) string {
 		hashedPassword, err := golangmodule.HashPassword(password)
 		if err != nil {
 			// Penanganan kesalahan jika terjadi kesalahan saat menghash password
-			// Misalnya, dapat mencatat kesalahan atau mengembalikan string kosong
-			// tergantung pada kebutuhan aplikasi Anda.
-			// Di sini, kita hanya mencatat kesalahan dalam log dan mengembalikan string kosong.
 			log.Error("Gagal menghash password:", err)
 			return ""
 		}

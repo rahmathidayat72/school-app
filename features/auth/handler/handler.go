@@ -37,7 +37,7 @@ func (handler *AuthHandler) Auth(c echo.Context) error {
 			return golangmodule.BuildResponse(nil, http.StatusUnauthorized, "Invalid credentials", c)
 		}
 		log.Printf("Error during login for email %s: %v", inputLogin.Email, err)
-		return golangmodule.BuildResponse(nil, http.StatusNotFound, "error: email or password is wrong", c)
+		return golangmodule.BuildResponse(nil, http.StatusInternalServerError, "error: email or password is wrong", c)
 	}
 
 	data := map[string]interface{}{

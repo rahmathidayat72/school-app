@@ -56,9 +56,9 @@ func main() {
 	v1.POST("/register", userHandlerAPI.CreatedUser)
 	user := v1.Group("/user")
 	user.Use(middleware.JWT([]byte(cfg.JWT_SECRET)))
-	user.GET("/list", userHandlerAPI.GetAllUsers)
+	user.GET("/listuser", userHandlerAPI.GetAllUsers)
 	user.GET("/detail-id/:id", userHandlerAPI.GetUsersById)
-	user.GET("/detail-name", userHandlerAPI.DetailByName)
+	user.GET("/detail-user", userHandlerAPI.DetailByName)
 	user.POST("/update", userHandlerAPI.UpdateUser)
 	user.DELETE("/delete", userHandlerAPI.DeleteUser)
 

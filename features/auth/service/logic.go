@@ -15,7 +15,6 @@ func NewServiceAuth(repo auth.DataAuthInterface) auth.ServiceAuthInterface {
 	}
 }
 
-// Login implements auth.ServiceAuthInterface.
 func (a *authService) Login(email string, password string) (dataLogin auth.UserCore, err error) {
 	log.Printf("Starting login process for email: %s", email)
 	dataLogin, err = a.authData.Login(email, password)

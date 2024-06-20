@@ -30,8 +30,6 @@ github.com/mattn/go-isatty v0.0.20 h1:xfD0iDuEKnDkl03q4limB+vH+GxLEtL/jb4xVJSWWE
 github.com/mattn/go-isatty v0.0.20/go.mod h1:W+V8PltTTMOvKvAeJH7IuucS94S2C6jfK/D7dTCTo3Y=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/rahmathidayat72/golang-module v1.1.0 h1:DL053hU1YxHElOOOTDuzCdmEuMXK3sYKOtMXDFwXNGk=
-github.com/rahmathidayat72/golang-module v1.1.0/go.mod h1:3p73jzPYyZ18dKMfuofEk+X7ywUxsvAxKRUEhon7MNo=
 github.com/rahmathidayat72/golang-module v1.2.0 h1:g+e5GHLjlHzg5g8MBQzkTtp4w6e7B9bWOtQ2FhabVg4=
 github.com/rahmathidayat72/golang-module v1.2.0/go.mod h1:nglaG8QoEtTEXzvPY1RlxH1nGbHXbINoSW+1bmidFfU=
 github.com/sirupsen/logrus v1.9.3 h1:dueUQJ1C2q9oE3F7wvmSGAaVtTmUizReu6fjN8uqzbQ=
