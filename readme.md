@@ -24,10 +24,10 @@
   go get -u gorm.io/driver/postgres
   ```
 
-- Genered viper (to load .evn automatically)
+- Genered Godotenv (to load .evn automatically)
 
   ```
-  go get -u github.com/spf13/viper
+  go get -u github.com/joho/godotenv
   ```
 
 - Created file `local.env`
