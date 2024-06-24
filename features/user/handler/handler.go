@@ -191,6 +191,6 @@ func (handler *UserHandler) DeleteUser(c echo.Context) error {
 		log.Printf("Error in Update user (userService.Delete): %s", err)
 		return golangmodule.BuildResponse(nil, http.StatusInternalServerError, "error", c)
 	}
-	log.Printf("Successfully fetched users id %s ", idStr)
+	log.Printf("Successfully delete users id %s ", idStr)
 	return golangmodule.BuildResponse(nil, http.StatusOK, "User delete successfully", c)
 }

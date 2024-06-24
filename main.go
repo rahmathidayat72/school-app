@@ -6,6 +6,9 @@ import (
 	authdata "apk-sekolah/features/auth/data"
 	authhandler "apk-sekolah/features/auth/handler"
 	authservice "apk-sekolah/features/auth/service"
+	mapeldata "apk-sekolah/features/mapel/data"
+	mapelhandler "apk-sekolah/features/mapel/handler"
+	mapelservice "apk-sekolah/features/mapel/service"
 	"apk-sekolah/features/user/data"
 	"apk-sekolah/features/user/handler"
 	"apk-sekolah/features/user/service"
@@ -47,6 +50,10 @@ func main() {
 	authService := authservice.NewServiceAuth(authUser)
 	authHandlerAPI := authhandler.NewHandlerAuth(authService)
 
+	datamapel := mapeldata.NewDataMApel(db)
+	mapelService := mapelservice.NewServiceMapel(datamapel)
+	mapelHandlerAPI := mapelhandler.NewHandlerMapel(mapelService)
+
 	v1 := e.Group("/api/v1")
 	v1.GET("/home", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]interface{}{
@@ -64,6 +71,13 @@ func main() {
 
 	auth := v1.Group("/auth")
 	auth.POST("/login", authHandlerAPI.Auth)
+
+	mapel := v1.Group("/mapel")
+	mapel.Use(middleware.JWT([]byte(cfg.JWT_SECRET)))
+	mapel.POST("/insert", mapelHandlerAPI.InsertMapel)
+	mapel.GET("/list-mapel", mapelHandlerAPI.GetAllMapel)
+	mapel.POST("/update", mapelHandlerAPI.UpdateMapel)
+	mapel.DELETE("/delete", mapelHandlerAPI.DeleteMapel)
 
 	// Menambahkan pesan log untuk informasi port aplikasi
 	port := ":8080"

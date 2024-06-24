@@ -3,6 +3,7 @@ package data
 import (
 	"apk-sekolah/features/user"
 	"apk-sekolah/helpers"
+	"fmt"
 
 	"errors"
 	"log"
@@ -64,7 +65,7 @@ func (r *UserQuery) SelectAll() ([]user.UserCore, error) {
 
 	// Logging informasi sukses setelah loop
 	log.Printf("Successfully fetched %d users from database", len(coreUser))
-
+	fmt.Println("2", coreUser)
 	return coreUser, nil
 }
 

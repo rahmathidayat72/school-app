@@ -20,13 +20,6 @@ func (u *User) TableName() string {
 	return "user"
 }
 
-func FormatterRequest(req user.UserCore) User {
-	return User{
-		Email:    req.Email,
-		Password: req.Password,
-	}
-}
-
 func FormatterResponse(res User) user.UserCore {
 	return user.UserCore{
 		ID:    res.ID,
