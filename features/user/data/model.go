@@ -16,7 +16,7 @@ type (
 		Password string         `gorm:"type:varchar(72) not null;" json:"password"`
 		Telepon  string         `gorm:"type:varchar(200) not null;" json:"telepon"`
 		Alamat   string         `gorm:"type:varchar(200) not null;" json:"alamat"`
-		Role     string         `json:"role" gorm:"type:enum('user','admin');default:'user'"`
+		Role     string         `json:"role" gorm:"type:enum('user','admin','guru','siswa');default:'user'"`
 		CreateAd time.Time      `json:"create_at"`
 		UpdateAd time.Time      `json:"update_at"`
 		DeleteAd gorm.DeletedAt `gorm:"index;" json:"delete_at"`
