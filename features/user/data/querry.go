@@ -8,6 +8,8 @@ import (
 	"errors"
 	"log"
 
+	"github.com/google/uuid"
+	golangmodule "github.com/rahmathidayat72/golang-module"
 	"gorm.io/gorm"
 )
 
@@ -26,9 +28,10 @@ func (r *UserQuery) Insert(insert user.UserCore) error {
 	userInput := FormatterRequest(insert)
 	userInput.Password = helpers.HashPassword(userInput.Password)
 
+	// Insert into the user table
 	result := r.db.Exec(`
-	INSERT INTO school."user" (id,nama, email, password, telepon, alamat, role)
-	VALUES (?,?, ?, ?, ?, ?, ?)
+	INSERT INTO school."user" (id, nama, email, password, telepon, alamat, role)
+	VALUES (?, ?, ?, ?, ?, ?, ?)
 	`, userInput.ID, userInput.Nama, userInput.Email, userInput.Password, userInput.Telepon, userInput.Alamat, userInput.Role)
 
 	if result.Error != nil {
@@ -41,6 +44,48 @@ func (r *UserQuery) Insert(insert user.UserCore) error {
 		err := errors.New("failed to insert, row affected is 0")
 		log.Printf("Error inserting user: %v", err)
 		return err
+	}
+
+	// Check if the role is 'guru' and insert into the guru table
+	if userInput.Role == "guru" {
+		// Generate UUID for the guru ID
+		guruID := uuid.New().String()
+
+		guruResult := r.db.Exec(`
+		INSERT INTO school.guru (id, nama, email, alamat, user_id)
+		VALUES (?, ?, ?, ?, ?)
+		`, guruID, userInput.Nama, userInput.Email, userInput.Alamat, userInput.ID)
+
+		if guruResult.Error != nil {
+			log.Printf("Error inserting guru: %v", guruResult.Error)
+			return guruResult.Error
+		}
+
+		guruRowsAffected := guruResult.RowsAffected
+		if guruRowsAffected == 0 {
+			err := errors.New("failed to insert guru, row affected is 0")
+			log.Printf("Error inserting guru: %v", err)
+			return err
+		}
+	}
+	if userInput.Role == "siswa" {
+		siswaID := golangmodule.GenerateUUIDV4()
+
+		siswaResult := r.db.Exec(`
+		INSERT INTO school.siswa (id, nama, email, alamat, user_id)
+		VALUES (?, ?, ?, ?, ?)
+		`, siswaID, userInput.Nama, userInput.Email, userInput.Alamat, userInput.ID)
+
+		if siswaResult.Error != nil {
+			log.Printf("Error inserting guru: %v", siswaResult.Error)
+			return siswaResult.Error
+		}
+		guruRowsAffected := siswaResult.RowsAffected
+		if guruRowsAffected == 0 {
+			err := errors.New("failed to insert siswa, row affected is 0")
+			log.Printf("Error inserting siswa: %v", err)
+			return err
+		}
 	}
 
 	return nil

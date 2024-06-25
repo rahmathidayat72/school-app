@@ -3,7 +3,6 @@ package data
 import (
 	"apk-sekolah/features/mapel"
 	"errors"
-	"fmt"
 	"log"
 
 	"gorm.io/gorm"
@@ -46,7 +45,19 @@ func (r *MapelQuery) Insert(insert mapel.MapelCore) error {
 func (r *MapelQuery) SelectAll() ([]mapel.MapelCore, error) {
 	var dataMapel []Mapel
 
-	if tx := r.db.Raw(`SELECT id,guru_id,mapel FROM school."mapel" WHERE "delete_ad" IS NULL`).Scan(&dataMapel); tx.Error != nil {
+	if tx := r.db.Raw(`SELECT 
+    m.id,
+    m.guru_id,
+    g.nama AS nama_guru,
+    m.mapel 
+FROM 
+    school."mapel" m
+JOIN 
+    school."guru" g
+ON 
+    m.guru_id = g.id
+WHERE 
+    m."delete_ad" IS NULL;`).Scan(&dataMapel); tx.Error != nil {
 		log.Printf("Error executing SELECT query: %v", tx.Error)
 		return nil, tx.Error
 	}
@@ -58,7 +69,7 @@ func (r *MapelQuery) SelectAll() ([]mapel.MapelCore, error) {
 		coreMapel = append(coreMapel, mapel)
 	}
 	log.Printf("Successfully fetched %d users from database", len(coreMapel))
-	fmt.Println("1", coreMapel)
+	// fmt.Println("1", coreMapel)
 	return coreMapel, nil
 }
 
@@ -119,7 +130,19 @@ func (r *MapelQuery) Delete(id string) error {
 func (r *MapelQuery) GetByGuruID(mapelList *[]mapel.MapelCore, guruID string) ([]mapel.MapelCore, error) {
 	// panic("unimplemented")
 	var dataMapel []Mapel
-	querry := `SELECT * FROM school.mapel WHERE guru_id = ? AND delete_ad IS NULL`
+	querry := `SELECT 
+    m.*, 
+    g.nama AS nama_guru
+FROM 
+    school."mapel" m
+JOIN 
+    school."guru" g
+ON 
+    m.guru_id = g.id
+WHERE 
+    m.guru_id = ? 
+    AND m.delete_ad IS NULL;
+`
 	if tx := r.db.Raw(querry, guruID).Scan(&dataMapel); tx.Error != nil {
 		log.Printf("Error executing SELECT query: %v", tx.Error)
 		return nil, tx.Error
@@ -140,8 +163,19 @@ func (r *MapelQuery) SearchMapel(mapelList *[]mapel.MapelCore, searchParam strin
 	// panic("unimplemented")
 	var dataMapel []Mapel
 	querry := `
-	SELECT * FROM school."mapel" m
-	WHERE m."mapel" LIKE ?  OR m."id" LIKE ? AND "delete_ad" IS NULL
+	SELECT 
+    m.*,
+    g.nama AS nama_guru
+FROM 
+    school."mapel" m
+JOIN 
+    school."guru" g
+ON 
+    m.guru_id = g.id
+WHERE 
+    (m."mapel" LIKE ? OR m."id" LIKE ?)
+    AND m."delete_ad" IS NULL;
+
 	`
 	if tx := r.db.Raw(querry, "%"+searchParam+"%", "%"+searchParam+"%").Scan(&dataMapel); tx.Error != nil {
 		log.Printf("Error executing SELECT query: %v", tx.Error)

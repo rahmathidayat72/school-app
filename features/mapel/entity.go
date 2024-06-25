@@ -4,8 +4,9 @@ import "time"
 
 type (
 	MapelCore struct {
-		ID       string     `json:"id"`                  // Primary Key
-		GuruID   string     `json:"guru_id"`             // Not Null
+		ID       string     `json:"id"`      // Primary Key
+		GuruID   string     `json:"guru_id"` // Not Null
+		NamaGuru string     `json:"nama_guru"`
 		Mapel    string     `json:"mapel"`               // Not Null
 		CreateAd time.Time  `json:"create_ad"`           // Not Null, Default: CURRENT_TIMESTAMP
 		UpdateAd *time.Time `json:"update_ad,omitempty"` // Nullable

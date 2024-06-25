@@ -68,9 +68,10 @@ func (handler *MapelHandler) GetAllMapel(c echo.Context) error {
 		mapelResponse = make([]ResponseMapel, len(mapelCore))
 		for i, v := range mapelCore {
 			mapelResponse[i] = ResponseMapel{
-				ID:     v.ID,
-				GuruID: v.GuruID,
-				Mapel:  v.Mapel,
+				ID:       v.ID,
+				GuruID:   v.GuruID,
+				NamaGuru: v.NamaGuru,
+				Mapel:    v.Mapel,
 			}
 		}
 	}

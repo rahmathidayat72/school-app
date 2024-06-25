@@ -41,8 +41,8 @@ func (s *userService) Insert(insert user.UserCore) error {
 		insert.Role = "user"
 	} else {
 		// Validasi role input
-		if insert.Role != "admin" && insert.Role != "user" {
-			return errors.New("validation error: Role can only be set to 'user' or 'admin'")
+		if insert.Role != "admin" && insert.Role != "user" && insert.Role != "guru" && insert.Role != "siswa" {
+			return errors.New("validation error: Role can only be set to 'user' or 'admin'or'guru'or'siswa'")
 		}
 	}
 
